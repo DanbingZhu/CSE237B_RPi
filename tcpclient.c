@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
     while(timer < 60) {
         char* f_latency = "latency.txt";
         FILE *fp_latency = fopen(f_latency, "a+");
-        char* f_name = "send.jpg";
+        char* f_name = "send.png";
         int size;
         FILE *fp = fopen(f_name, "rb");
 
@@ -163,8 +163,8 @@ int main(int argc, char **argv) {
         }
         
         uint64_t t_finish;
-        n = read(sockfd, &t_finish, sizeof(uint64_t));
         n = read(sockfd, &tag, sizeof(int));
+        n = read(sockfd, &t_finish, sizeof(uint64_t));
 
         printf("ieration %d\n", tag);
         printf("t_finish: %llu\n", t_finish);
