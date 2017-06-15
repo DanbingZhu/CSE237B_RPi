@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
         }
         
         uint64_t t_finish;
-        n = read(sockfd, &t_finish, sizeof(ui/nt64_t));
+        n = read(sockfd, &t_finish, sizeof(uint64_t));
 
         printf("t_finish: %llu\n", t_finish);
         
