@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
         //printf("ieration %d\n", tag);
         printf("t_finish: %llu\n", t_finish);
         
-        double offset = get_offset();
+        double offset = 0;//get_offset();
         
         double latency = t_finish/1000000.0 - ((double)tv_start.tv_sec - tv_start.tv_usec/1000000.0) - offset;
        
