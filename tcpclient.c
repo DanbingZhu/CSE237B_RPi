@@ -149,6 +149,7 @@ int main(int argc, char **argv) {
 
         struct timeval tv_start;
         gettimeofday(&tv_start, NULL);
+        printf("SENd Sec Usec: %ld， %d\n", tv_start.tv_sec, tv_start.tv_usec);
         
         bzero(buf, BUFSIZE);
         int f_block_sz;
