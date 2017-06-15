@@ -137,7 +137,7 @@ int main(int argc, char **argv) {
         fseek(fp, 0, SEEK_END);
         size = ftell(fp);
         fseek(fp, 0, SEEK_SET);
-        printf("%d\n", size);
+        printf("Image size is: %d\n", size);
         
         //n = write(sockfd, &timer, sizeof(int));
         //if (n < 0)
