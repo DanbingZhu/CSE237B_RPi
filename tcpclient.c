@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
         
         double offset = get_offset();
         
-        double latency = t_finish/1000000.0 - ((double)tv_start.tv_sec + tv_start.tv_usec/1000000.0) - offset;
+        double latency = t_finish/1000000.0 - ((double)tv_start.tv_sec - tv_start.tv_usec/1000000.0) - offset;
        
         if(timer == 0){
         y_s = latency / 4.0;
