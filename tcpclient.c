@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 
-#define BUFSIZE 102400
+#define BUFSIZE 1024*4
 
 /*
  * error - wrapper for perror
