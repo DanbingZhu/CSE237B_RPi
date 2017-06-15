@@ -35,6 +35,53 @@ void estimiating(double *y_s, double *y_var, double *y_i, double *y_up){
 	*y_up = *y_s + kappa * (*y_var);
 }
 
+double get_offset(){
+    const char *filepath = "result.txt";
+    int fd = open(filepath, O_RDONLY, (mode_t)0600);
+    
+    if (fd == -1)
+    {
+        perror("Error opening file for writing");
+        exit(EXIT_FAILURE);
+    }
+    
+    struct stat fileInfo = {0};
+    
+    if (fstat(fd, &fileInfo) == -1)
+    {
+        perror("Error getting the file size");
+        exit(EXIT_FAILURE);
+    }
+    
+    if (fileInfo.st_size == 0)
+    {
+        fprintf(stderr, "Error: File is empty, nothing to do\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    printf("File size is %ji\n", (intmax_t)fileInfo.st_size);
+    
+    double *map = mmap(0, fileInfo.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    if (map == MAP_FAILED)
+    {
+        close(fd);
+        perror("Error mmapping the file");
+        exit(EXIT_FAILURE);
+    }
+    
+    double offset = map[0];
+    // Don't forget to free the mmapped memory
+    if (munmap(map, fileInfo.st_size) == -1)
+    {
+        close(fd);
+        perror("Error un-mmapping the file");
+        exit(EXIT_FAILURE);
+    }
+    // Un-mmaping doesn't close the file, so we still need to do that.
+    close(fd);
+    return offset;
+}
+
 int main(int argc, char **argv) {
     int sockfd, portno, n;
     struct sockaddr_in serveraddr;
@@ -74,16 +121,11 @@ int main(int argc, char **argv) {
     if (connect(sockfd, &serveraddr, sizeof(serveraddr)) < 0)
         error("ERROR connecting");
     
-    /* get message line from the user
-    printf("Please enter msg: ");
-    bzero(buf, BUFSIZE);
-    fgets(buf, BUFSIZE, stdin);*/
-    
     int timer = 0;
     while(timer < 60) {
         char* f_latency = "latency.txt";
         FILE *fp_latency = fopen(f_latency, "a+");
-        char* f_name = "result.txt";
+        char* f_name = "send.jpg";
         int size;
         FILE *fp = fopen(f_name, "rb");
 
@@ -116,58 +158,11 @@ int main(int argc, char **argv) {
         }
         
         uint64_t t_finish;
-        n = read(sockfd, &t_finish, sizeof(uint64_t));
+        n = read(sockfd, &t_finish, sizeof(ui/nt64_t));
 
         printf("t_finish: %llu\n", t_finish);
-
-        const char *filepath = "result.txt";
-        int fd = open(filepath, O_RDONLY, (mode_t)0600);
         
-        if (fd == -1)
-        {
-            perror("Error opening file for writing");
-            exit(EXIT_FAILURE);
-        }
-        
-        struct stat fileInfo = {0};
-        
-        if (fstat(fd, &fileInfo) == -1)
-        {
-            perror("Error getting the file size");
-            exit(EXIT_FAILURE);
-        }
-
-        if (fileInfo.st_size == 0)
-        {
-            fprintf(stderr, "Error: File is empty, nothing to do\n");
-            exit(EXIT_FAILURE);
-        }
-        
-        printf("File size is %ji\n", (intmax_t)fileInfo.st_size);
-        
-        double *map = mmap(0, fileInfo.st_size, PROT_READ, MAP_SHARED, fd, 0);
-        if (map == MAP_FAILED)
-        {
-            close(fd);
-            perror("Error mmapping the file");
-            exit(EXIT_FAILURE);
-        }
-        
-        double offset = map[0];
-            printf("offset is %f\n", offset);
-        /*for (off_t i = 0; i < fileInfo.st_size; i++)
-        {
-            printf("Found character %c at %ji\n", map[i], (intmax_t)i);
-        }*/
-        
-        // Don't forget to free the mmapped memory
-        if (munmap(map, fileInfo.st_size) == -1)
-        {
-            close(fd);
-            perror("Error un-mmapping the file");
-            exit(EXIT_FAILURE);
-        }
-        
+        double offset = get_offset();
         
         double latency = t_finish/1000000.0 - ((double)tv_start.tv_sec - tv_start.tv_usec/1000000.0) - offset;
        
@@ -182,8 +177,6 @@ int main(int argc, char **argv) {
         fprintf(fp_latency, "%f %f %f %f\n", latency, y_s, y_var, y_up);
         printf("Latency is %f, y_s is %f, y_var is %f, y_up is %f\n", latency, y_s, y_var, y_up);
 
-        // Un-mmaping doesn't close the file, so we still need to do that.
-        close(fd);
         fclose(fp);
         sleep(1);
         timer++;
