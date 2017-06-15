@@ -122,6 +122,7 @@ int main(int argc, char **argv) {
         error("ERROR connecting");
     
     int timer = 0;
+    int tag;
     while(timer < 60) {
         char* f_latency = "latency.txt";
         FILE *fp_latency = fopen(f_latency, "a+");
@@ -137,10 +138,14 @@ int main(int argc, char **argv) {
         size = ftell(fp);
         fseek(fp, 0, SEEK_SET);
         printf("%d\n", size);
+        
+        n = write(sockfd, &timer, sizeof(int));
+        if (n < 0)
+            error("ERROR writing to socket");
 
         n = write(sockfd, &size, sizeof(int));
         if (n < 0)
-                error("ERROR writing to socket");
+            error("ERROR writing to socket");
 
         struct timeval tv_start;
         gettimeofday(&tv_start, NULL);
@@ -159,7 +164,9 @@ int main(int argc, char **argv) {
         
         uint64_t t_finish;
         n = read(sockfd, &t_finish, sizeof(uint64_t));
+        n = read(sockfd, &tag, sizeof(int));
 
+        printf("ieration %d\n", tag);
         printf("t_finish: %llu\n", t_finish);
         
         double offset = get_offset();
