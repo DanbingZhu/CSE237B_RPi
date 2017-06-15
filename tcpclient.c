@@ -139,9 +139,9 @@ int main(int argc, char **argv) {
         fseek(fp, 0, SEEK_SET);
         printf("Image size is: %d\n", size);
         
-        //n = write(sockfd, &timer, sizeof(int));
-        //if (n < 0)
-        //    error("ERROR writing to socket");
+        n = write(sockfd, &timer, sizeof(int));
+        if (n < 0)
+            error("ERROR writing to socket");
 
         n = write(sockfd, &size, sizeof(int));
         if (n < 0)
@@ -163,13 +163,13 @@ int main(int argc, char **argv) {
         }
         
         uint64_t t_finish;
-        //n = read(sockfd, &tag, sizeof(int));
+        n = read(sockfd, &tag, sizeof(int));
         n = read(sockfd, &t_finish, sizeof(uint64_t));
 
-        //printf("ieration %d\n", tag);
+        printf("ieration %d\n", tag);
         printf("t_finish: %llu\n", t_finish);
         
-        double offset = 0;//get_offset();
+        double offset = get_offset();
         
         double latency = t_finish/1000000.0 - ((double)tv_start.tv_sec - tv_start.tv_usec/1000000.0) - offset;
        
