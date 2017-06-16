@@ -27,9 +27,9 @@ void error(char *msg) {
 }
 
 void estimiating(double *y_s, double *y_var, double *y_i, double *y_up){
-	double alpha = 0.5;
-    double beta = 0.5;
-	double kappa = 0.5;
+	double alpha = 0.1;
+    double beta = 0.1;
+	double kappa = 0.3;
 	*y_var = (1 - beta) * (*y_var) + beta * abs(*y_s - *y_i);
 	*y_s = (1 - alpha) * (*y_s) + alpha * (*y_i);
 	*y_up = *y_s + kappa * (*y_var);
